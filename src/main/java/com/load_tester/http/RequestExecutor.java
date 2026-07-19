@@ -8,6 +8,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class RequestExecutor {
     private final HttpClient client;
@@ -21,9 +22,8 @@ public class RequestExecutor {
         long start = System.nanoTime();
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .handle((response, error) -> {
-                    long latency = System.nanoTime() - start;
+                    long latency = TimeUnit.NANOSECONDS.toMillis(System.nanoTime()-start);
                     if (error != null) {
-                        error.printStackTrace();
                         return new RequestResult(
                                 false,
                                 -1,
