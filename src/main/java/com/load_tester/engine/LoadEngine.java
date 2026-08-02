@@ -1,6 +1,8 @@
 package com.load_tester.engine;
 
 import com.load_tester.config.LoadTestConfig;
+import com.load_tester.engine.model.FixedRequestsModel;
+import com.load_tester.engine.model.LoadModel;
 import com.load_tester.http.RequestExecutor;
 import com.load_tester.metrics.MetricsCollector;
 import com.load_tester.metrics.MetricsPrinter;
@@ -13,24 +15,13 @@ import java.util.concurrent.TimeUnit;
 
 public class LoadEngine
 {
-    private final RequestExecutor executor =
-            new RequestExecutor();
-    MetricsPrinter printer=new MetricsPrinter();
-    private final MetricsCollector metrics=new MetricsCollector();
+    private final MetricsPrinter printer=new MetricsPrinter();
     public void run(LoadTestConfig config) {
-        List<CompletableFuture<Void>> futures =
-                new ArrayList<>();
+        MetricsCollector metrics= new MetricsCollector();
+        RequestExecutor executor = new RequestExecutor();
+        LoadModel model=new FixedRequestsModel(config,executor,metrics);
         long start=System.nanoTime();
-        for (int i = 0; i < config.getTotalRequests(); i++){
-            CompletableFuture<Void> future=executor.execute(config.getUrl()).thenAccept(requestResult -> {
-//                System.out.println("Latency : "+requestResult.getLatencyMillis()+"ms");
-                metrics.record(requestResult);
-            });
-        futures.add(future);
-        }
-        CompletableFuture
-                .allOf(futures.toArray(new CompletableFuture[0]))
-                .join();
+        model.execute();
         long duration=System.nanoTime()-start;
         long durationMillis= TimeUnit.NANOSECONDS.toMillis(duration);
         printer.print(metrics,durationMillis);

@@ -12,7 +12,7 @@ public class Main
 //                        "https://httpbin.org/get",
                         "https://jsonplaceholder.typicode.com/posts/1",
                         "GET",
-                        5
+                        500
                 );
         new LoadEngine().run(config);
     }
