@@ -7,7 +7,6 @@ import com.load_tester.http.RequestExecutor;
 import com.load_tester.metrics.MetricsCollector;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -28,9 +27,9 @@ public class FixedUsersModel implements LoadModel {
 
     @Override
     public void execute() {
-        FixedUsersConfig usersConfig= (FixedUsersConfig) config.getWorkloadConfig();
-        int users=usersConfig.getUsers();
-        long endTime=System.currentTimeMillis()+usersConfig.getDurationSeconds()*1000L;
+        FixedUsersConfig usersConfig = (FixedUsersConfig) config.getWorkloadConfig();
+        int users = usersConfig.getUsers();
+        long endTime = System.currentTimeMillis() + usersConfig.getDurationSeconds() * 1000L;
         ExecutorService executorService = Executors.newFixedThreadPool(users);
         List<Future<?>> futures = new ArrayList<>();
         for (int i = 0; i < users; i++) {
@@ -38,15 +37,62 @@ public class FixedUsersModel implements LoadModel {
             Future<?> future = executorService.submit(user);
             futures.add(future);
         }
-        for (Future<?> future : futures) {
+        Thread monitor = new Thread(() -> {
+
             try {
-                future.get();
+
+                while (!Thread.currentThread().isInterrupted()) {
+
+                    System.out.println(
+                            "Active Users = "
+                                    + metrics.getActiveUsers()
+                                    + " | In-Flight = "
+                                    + metrics.getInFlightRequests()
+                                    + " | Completed = "
+                                    + metrics.getCompletedRequests()
+                    );
+
+                    Thread.sleep(1000);
+                }
+
             } catch (InterruptedException e) {
+
                 Thread.currentThread().interrupt();
+            }
+        });
+
+        monitor.start();
+
+
+// Wait for all users
+        for (Future<?> future : futures) {
+
+            try {
+
+                future.get();
+
+            } catch (InterruptedException e) {
+
+                Thread.currentThread().interrupt();
+
             } catch (ExecutionException e) {
+
                 e.printStackTrace();
             }
         }
+
+
+// Stop monitoring
+        monitor.interrupt();
+        try{
+            monitor.join();
+        }catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
+        }
+
+
+// Shut down executor
         executorService.shutdown();
     }
 }

@@ -16,10 +16,20 @@ public class VirtualUser implements Runnable{
         this.endTime=endTime;
     }
 
-    public void run(){
-        while(System.currentTimeMillis()<endTime)
-        {
-            executor.execute(url).thenAccept(metrics::record).join();
+    @Override
+    public void run() {
+        metrics.userStarted();
+        try{
+            while(System.currentTimeMillis()<endTime) {
+                metrics.requestStarted();
+                try {
+                    executor.execute(url).thenAccept(result -> metrics.record(result)).join();
+                } finally {
+                    metrics.requestFinished();
+                }
+            }
+        }finally {
+            metrics.userFinished();
         }
     }
 }

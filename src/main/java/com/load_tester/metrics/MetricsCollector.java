@@ -13,6 +13,8 @@ public class MetricsCollector {
     private final AtomicInteger successfulRequests = new AtomicInteger();
     private final AtomicInteger failedRequests = new AtomicInteger();
     private final AtomicLong totalLatency = new AtomicLong();
+    private final AtomicInteger activeUsers = new AtomicInteger();
+    private final AtomicInteger inFlightRequests = new AtomicInteger();
 
     private final AtomicLong minLatency =
             new AtomicLong(Long.MAX_VALUE);
@@ -21,25 +23,35 @@ public class MetricsCollector {
     private final ConcurrentHashMap<Integer, AtomicInteger>
             statusCodeCounts = new ConcurrentHashMap<>();
 
+
     public void record(RequestResult result) {
+
         completedRequests.incrementAndGet();
-        if (result.isSuccess())
+
+        totalLatency.addAndGet(
+                result.getLatencyMillis()
+        );
+
+        if (result.isSuccess()) {
             successfulRequests.incrementAndGet();
-        else
+        } else {
             failedRequests.incrementAndGet();
-        totalLatency.addAndGet(result.getLatencyMillis());
+        }
+
         minLatency.accumulateAndGet(
                 result.getLatencyMillis(),
                 Math::min
         );
+
         maxLatency.accumulateAndGet(
                 result.getLatencyMillis(),
                 Math::max
         );
+
         statusCodeCounts
                 .computeIfAbsent(
                         result.getStatusCode(),
-                        k -> new AtomicInteger()
+                        key -> new AtomicInteger()
                 )
                 .incrementAndGet();
     }
@@ -78,4 +90,26 @@ public class MetricsCollector {
     public Map<Integer, AtomicInteger> getStatusCodeCounts() {
         return statusCodeCounts;
     }
+
+    public void userStarted(){
+        activeUsers.incrementAndGet();
+    }
+    public void userFinished(){
+        activeUsers.decrementAndGet();
+    }
+    public int getActiveUsers(){
+        return activeUsers.get();
+    }
+
+    public void requestStarted(){
+        inFlightRequests.incrementAndGet();
+    }
+    public void requestFinished(){
+        inFlightRequests.decrementAndGet();
+    }
+
+    public int getInFlightRequests(){
+        return inFlightRequests.get();
+    }
+
 }
