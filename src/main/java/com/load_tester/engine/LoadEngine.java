@@ -2,6 +2,7 @@ package com.load_tester.engine;
 
 import com.load_tester.config.LoadTestConfig;
 import com.load_tester.engine.model.FixedRequestsModel;
+import com.load_tester.engine.model.FixedUsersModel;
 import com.load_tester.engine.model.LoadModel;
 import com.load_tester.http.RequestExecutor;
 import com.load_tester.metrics.MetricsCollector;
@@ -19,7 +20,7 @@ public class LoadEngine
     public void run(LoadTestConfig config) {
         MetricsCollector metrics= new MetricsCollector();
         RequestExecutor executor = new RequestExecutor();
-        LoadModel model=new FixedRequestsModel(config,executor,metrics);
+        LoadModel model=LoadModelFactory.create(config,executor,metrics);
         long start=System.nanoTime();
         model.execute();
         long duration=System.nanoTime()-start;

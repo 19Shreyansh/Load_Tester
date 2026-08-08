@@ -1,6 +1,7 @@
 package com.load_tester.engine.model;
 
 import com.load_tester.config.LoadTestConfig;
+import com.load_tester.config.workload.FixedRequestsConfig;
 import com.load_tester.http.RequestExecutor;
 import com.load_tester.metrics.MetricsCollector;
 
@@ -21,9 +22,10 @@ public class FixedRequestsModel implements LoadModel{
 
     @Override
     public void execute() {
+        FixedRequestsConfig requestsConfig=(FixedRequestsConfig) config.getWorkloadConfig();
         List<CompletableFuture<Void>> futures =
                 new ArrayList<>();
-        for (int i = 0; i < config.getTotalRequests(); i++){
+        for (int i = 0; i < requestsConfig.getTotalRequests(); i++){
             CompletableFuture<Void> future=executor.execute(config.getUrl()).thenAccept(requestResult -> {
                 metrics.record(requestResult);
             });

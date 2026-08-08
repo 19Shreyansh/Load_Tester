@@ -1,21 +1,34 @@
 package com.load_tester.config;
 
+import com.load_tester.config.workload.WorkloadConfig;
+
 public class LoadTestConfig {
+    private final LoadType loadType;
     private final String url;
     private final String method;
-    private final int totalRequests;
+    private final WorkloadConfig workloadConfig;
 
-    public LoadTestConfig(String url, String method, int totalRequests) {
+    public LoadTestConfig(String url, String method, LoadType loadType, WorkloadConfig workloadConfig) {
         this.url = url;
         this.method = method;
-        this.totalRequests = totalRequests;
+        this.loadType=loadType;
+        this.workloadConfig=workloadConfig;
     }
 
     public String getUrl(){
         return url;
     }
 
-    public int getTotalRequests(){
-        return totalRequests;
+    public String getMethod(){
+        return method;
     }
+
+    public LoadType getLoadType(){
+        return loadType;
+    }
+
+    public WorkloadConfig getWorkloadConfig(){
+        return workloadConfig;
+    }
+
 }
