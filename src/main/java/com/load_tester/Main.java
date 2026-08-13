@@ -23,7 +23,7 @@ public class Main
                 new LoadTestConfig(
 //                        "https://httpbin.org/get",
                         "https://jsonplaceholder.typicode.com/posts/1",
-                        "GET",
+//                        "GET",
                         LoadType.FIXED_USERS,
                         new FixedUsersConfig(30,10)
                 );

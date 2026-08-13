@@ -4,7 +4,7 @@ import com.load_tester.config.LoadTestConfig;
 import com.load_tester.config.workload.FixedUsersConfig;
 import com.load_tester.engine.user.VirtualUser;
 import com.load_tester.http.RequestExecutor;
-import com.load_tester.metrics.MetricsCollector;
+import com.load_tester.metrics.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +14,7 @@ public class FixedUsersModel implements LoadModel {
     private final LoadTestConfig config;
     private final RequestExecutor executor;
     private final MetricsCollector metrics;
+    private final MetricsHistory history = new MetricsHistory();
 
     public FixedUsersModel(
             LoadTestConfig config,
@@ -23,6 +24,10 @@ public class FixedUsersModel implements LoadModel {
         this.config = config;
         this.executor = executor;
         this.metrics = metrics;
+    }
+
+    public MetricsHistory getHistory() {
+        return history;
     }
 
     @Override
@@ -37,62 +42,29 @@ public class FixedUsersModel implements LoadModel {
             Future<?> future = executorService.submit(user);
             futures.add(future);
         }
-        Thread monitor = new Thread(() -> {
+        MetricsMonitor monitor = new MetricsMonitor(metrics, history);
+        Thread monitorThread = new Thread(monitor);
+        monitorThread.start();
+        waitForUsers(futures);
+        monitorThread.interrupt();
+        try {
+            monitorThread.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        history.addFinalSnapshot(metrics);
+        executorService.shutdown();
+    }
 
-            try {
-
-                while (!Thread.currentThread().isInterrupted()) {
-
-                    System.out.println(
-                            "Active Users = "
-                                    + metrics.getActiveUsers()
-                                    + " | In-Flight = "
-                                    + metrics.getInFlightRequests()
-                                    + " | Completed = "
-                                    + metrics.getCompletedRequests()
-                    );
-
-                    Thread.sleep(1000);
-                }
-
-            } catch (InterruptedException e) {
-
-                Thread.currentThread().interrupt();
-            }
-        });
-
-        monitor.start();
-
-
-// Wait for all users
+    private void waitForUsers(List<Future<?>> futures) {
         for (Future<?> future : futures) {
-
             try {
-
                 future.get();
-
             } catch (InterruptedException e) {
-
                 Thread.currentThread().interrupt();
-
             } catch (ExecutionException e) {
-
                 e.printStackTrace();
             }
         }
-
-
-// Stop monitoring
-        monitor.interrupt();
-        try{
-            monitor.join();
-        }catch (InterruptedException e)
-        {
-            Thread.currentThread().interrupt();
-        }
-
-
-// Shut down executor
-        executorService.shutdown();
     }
 }

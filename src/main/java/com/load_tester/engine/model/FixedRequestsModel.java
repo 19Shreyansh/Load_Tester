@@ -26,18 +26,12 @@ public class FixedRequestsModel implements LoadModel{
         List<CompletableFuture<Void>> futures =
                 new ArrayList<>();
         for (int i = 0; i < requestsConfig.getTotalRequests(); i++){
-            CompletableFuture<Void> future=executor.execute(config.getUrl()).thenAccept(requestResult -> {
-                metrics.record(requestResult);
-            });
+            CompletableFuture<Void> future=executor.execute(config.getUrl()).thenAccept(metrics::record);
             futures.add(future);
         }
         CompletableFuture
                 .allOf(futures.toArray(new CompletableFuture[0]))
                 .join();
 
+        }
     }
-
-
-    }
-
-

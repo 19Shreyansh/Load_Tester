@@ -1,7 +1,5 @@
 package com.load_tester.config.workload;
 
-import com.load_tester.engine.model.FixedUsersModel;
-
 public class FixedUsersConfig implements WorkloadConfig{
     private final int users;
     private final int durationSeconds;

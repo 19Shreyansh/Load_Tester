@@ -1,17 +1,10 @@
 package com.load_tester.engine;
 
 import com.load_tester.config.LoadTestConfig;
-import com.load_tester.engine.model.FixedRequestsModel;
-import com.load_tester.engine.model.FixedUsersModel;
 import com.load_tester.engine.model.LoadModel;
 import com.load_tester.http.RequestExecutor;
 import com.load_tester.metrics.MetricsCollector;
 import com.load_tester.metrics.MetricsPrinter;
-import com.load_tester.model.RequestResult;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class LoadEngine
