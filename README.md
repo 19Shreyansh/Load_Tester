@@ -34,7 +34,7 @@ java -version
 ## Download
 
 The latest release provides a ready-to-run executable JAR.
-**[Download Load Tester v1.0.0](https://github.com/19Shreyansh/Load_Tester/releases/tag/v1.0.0)**
+**[Download Load Tester v1.0.0](https://github.com/19Shreyansh/Load_Tester/releases/download/v1.0.0/load_tester-1.0.0.jar)**
 
 You do not need Maven or the source code to run the released JAR.
 
