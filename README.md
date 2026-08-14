@@ -25,10 +25,20 @@ traffic against an HTTP endpoint and collecting performance metrics.
 
 - Java 21 or later
 
-## Quick Start
+Check your Java installation:
+
+```bash
+java -version
+```
+## Download
+
+The latest release provides a ready-to-run executable JAR.
+Download:
+`load_tester-1.0.0.jar`
+
+You do not need Maven or the source code to run the released JAR.
 
 Download the release JAR and run:
-
 ```bash
 java -jar load_tester-1.0.0.jar \
   --url "https://example.com" \
