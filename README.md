@@ -30,17 +30,25 @@ Check your Java installation:
 ```bash
 java -version
 ```
+
 ## Download
 
 The latest release provides a ready-to-run executable JAR.
-Download:
-`load_tester-1.0.0.jar`
+**[Download Load Tester v1.0.0](https://github.com/19Shreyansh/Load_Tester/releases/tag/v1.0.0)**
 
 You do not need Maven or the source code to run the released JAR.
 
-Download the release JAR and run:
+After downloading `load_tester-1.0.0.jar`, run a load test against an HTTP endpoint:
+
+## Windows PowerShell
+```powershell
+java -jar load_tester-1.0.0.jar --url "https://example.com" --users 10 --duration 30
+```
+
+## Linux/macOS
 ```bash
 java -jar load_tester-1.0.0.jar \
   --url "https://example.com" \
   --users 10 \
   --duration 30
+```
