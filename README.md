@@ -138,13 +138,16 @@ java -jar load_tester-1.1.0.jar \
   ```
 
 ## CLI Options
-- --url <url>             Target URL  
-- --method <GET|POST>     HTTP request method
-- --users <number>        Number of concurrent users
-- --duration <seconds>    Test duration
-- --timeout <seconds>     Request timeout (default: 30)
-- --body <body>           Request body for POST
-- --body-file <file>      Read POST body from file
-- --header <name:value>   HTTP request header (repeatable)
-- --version               Show version
-- --help, -h              Show this help message
+| Option                  | Description                      |
+|-------------------------|----------------------------------|
+| `--url <url>`           | Target URL                       |
+| `--method <GET\POST>`   | HTTP request method              |
+| `--users <number>`      | Number of concurrent users       |
+| `--duration <seconds>`  | Test duration                    |
+| `--timeout <seconds>`   | Request timeout (default: 30)    |
+| `--body <body>`         | Request body for POST            |
+| `--body-file <file>`    | Read POST body from file         |    
+| `--header <name:value>` | HTTP request header (repeatable) |       
+| `--version`             | Show version                     |
+| `--help`, `-h`          | Show this help message           |
+       
