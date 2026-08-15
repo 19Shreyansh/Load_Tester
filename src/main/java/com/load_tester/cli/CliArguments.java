@@ -9,15 +9,19 @@ public class CliArguments {
     private final int duration;
     private final String method;
     private final String body;
+    private final String bodyFile;
     private final Map<String, String> headers;
+    private final int timeout;
 
-    public CliArguments(String url, int users, int duration, String method, String body, Map<String, String> headers) {
+    public CliArguments(String url, int users, int duration, String method, String body, String bodyFile, Map<String, String> headers, int timeout) {
         this.url = url;
         this.users = users;
         this.duration = duration;
         this.method=method;
         this.body=body;
+        this.bodyFile=bodyFile;
         this.headers=headers;
+        this.timeout=timeout;
     }
 
     public String getUrl() {
@@ -40,8 +44,16 @@ public class CliArguments {
         return body;
     }
 
+    public String getBodyFile(){
+        return bodyFile;
+    }
+
     public Map<String, String> getHeaders(){
         return headers;
+    }
+
+    public int getTimeout(){
+        return timeout;
     }
 
 }

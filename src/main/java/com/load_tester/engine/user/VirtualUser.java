@@ -1,21 +1,23 @@
 package com.load_tester.engine.user;
 
+import com.load_tester.http.HttpRequestConfig;
 import com.load_tester.http.RequestExecutor;
 import com.load_tester.metrics.MetricsCollector;
+
+import java.util.Map;
 
 public class VirtualUser implements Runnable{
     private final RequestExecutor executor;
     private final MetricsCollector metrics;
-    private final String url;
+    private final HttpRequestConfig requestConfig;
     private final long endTime;
-    private final String method;
 
-    public VirtualUser(RequestExecutor executor, MetricsCollector metrics, String url, String method, long endTime){
+    public VirtualUser(RequestExecutor executor, MetricsCollector metrics,
+                       HttpRequestConfig requestConfig, long endTime){
         this.executor=executor;
         this.metrics=metrics;
-        this.url=url;
+        this.requestConfig=requestConfig;
         this.endTime=endTime;
-        this.method=method;
     }
 
     @Override
@@ -25,7 +27,7 @@ public class VirtualUser implements Runnable{
             while(System.currentTimeMillis()<endTime) {
                 metrics.requestStarted();
                 try {
-                    executor.execute(url,method).thenAccept(result -> metrics.record(result)).join();
+                    executor.execute(requestConfig).thenAccept(result -> metrics.record(result)).join();
                 } finally {
                     metrics.requestFinished();
                 }

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CliParser {
-
+    private static final int DEFAULT_TIMEOUT = 30;
     public static CliArguments parse(String[] args) {
 
         if (args.length == 0) {
@@ -34,6 +34,7 @@ public class CliParser {
             }
 
             String value=args[++i];
+            values.put(argument, value);
             if(argument.equals("--header"))
                 parseHeader(value,headers);
             else
@@ -44,7 +45,9 @@ public class CliParser {
         String method = values.get("--method");
         String usersValue = values.get("--users");
         String durationValue = values.get("--duration");
-        String body=values.get("--body");
+        String body = values.get("--body");
+        String bodyFile = values.get("--body-file");
+        String timeoutValue = values.get("--timeout");
 
         if (url == null) {
             throw new IllegalArgumentException(
@@ -70,6 +73,20 @@ public class CliParser {
             );
         }
 
+        if(body!=null && bodyFile!=null)
+            throw new IllegalArgumentException("Use either --body or --body-file, not both.");
+
+        if (bodyFile != null) {
+            try {
+                body = java.nio.file.Files.readString(
+                        java.nio.file.Path.of(bodyFile)
+                );
+            } catch (java.io.IOException e) {
+                throw new IllegalArgumentException(
+                        "Unable to read body file: " + bodyFile
+                );
+            }
+        }
         validateUrl(url);
 
         method = validateMethod(method);
@@ -86,13 +103,22 @@ public class CliParser {
                 "--duration"
         );
 
+        int timeout = timeoutValue == null
+                ? DEFAULT_TIMEOUT
+                : parsePositiveInteger(
+                timeoutValue,
+                "--timeout"
+        );
+
         return new CliArguments(
                 url,
                 users,
                 duration,
                 method,
                 body,
-                headers
+                bodyFile,
+                headers,
+                timeout
         );
     }
 

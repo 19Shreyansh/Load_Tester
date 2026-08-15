@@ -6,6 +6,7 @@ import com.load_tester.config.workload.FixedRequestsConfig;
 import com.load_tester.config.workload.FixedUsersConfig;
 import com.load_tester.config.workload.WorkloadConfig;
 import com.load_tester.engine.LoadEngine;
+import com.load_tester.http.HttpRequestConfig;
 
 import java.util.Map;
 
@@ -15,20 +16,26 @@ public class Main
     {
 //        LoadTestConfig config =
 //                new LoadTestConfig(
-////                        "https://httpbin.org/get",
-//                        "https://jsonplaceholder.typicode.com/posts/1",
-//                        "GET",
-//                        LoadType.FIXED_REQUESTS,
-//                        new FixedRequestsConfig(500)
+//                        new HttpRequestConfig(
+//                                "https://jsonplaceholder.typicode.com/posts",
+//                                "POST",
+//                                body,
+//                                headers,
+//                                20
+//                                ),
+//                        LoadType.FIXED_USERS,
+//                        new FixedUsersConfig(5,10)
 //                );
         LoadTestConfig config =
                 new LoadTestConfig(
-//                        "https://httpbin.org/get",
-                        "https://jsonplaceholder.typicode.com/posts/1",
-                        "GET",
+                        new HttpRequestConfig(
+                                "https://jsonplaceholder.typicode.com/posts/1",
+                                "GET",
+                                null,
+                                Map.of(),
+                                20
+                                ),
                         LoadType.FIXED_USERS,
-                        null,
-                        Map.of(),
                         new FixedUsersConfig(30,10)
                 );
         new LoadEngine().run(config);

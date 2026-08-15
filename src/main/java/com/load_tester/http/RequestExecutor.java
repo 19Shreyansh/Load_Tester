@@ -8,6 +8,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -23,37 +24,54 @@ public class RequestExecutor {
                 .build();
     }
 
-    public CompletableFuture<RequestResult> execute(
-            String url,
-            String method) {
+    public CompletableFuture<RequestResult> execute(HttpRequestConfig requestConfig) {
 
         HttpRequest.Builder builder =
                 HttpRequest.newBuilder()
-                        .uri(URI.create(url));
+                        .uri(URI.create(requestConfig.getUrl()))
+                                .timeout(Duration.ofSeconds(requestConfig.getTimeoutSeconds()));
+
+
+        if (requestConfig.getHeaders()!= null) {
+
+            for (Map.Entry<String, String> header : requestConfig.getHeaders().entrySet()) {
+
+                builder.header(
+                        header.getKey(),
+                        header.getValue()
+                );
+            }
+        }
 
         HttpRequest request;
 
-        if (method.equalsIgnoreCase("GET")) {
+        if (requestConfig.getMethod().equalsIgnoreCase("GET")) {
 
             request = builder
                     .GET()
                     .build();
 
-        } else if (method.equalsIgnoreCase("POST")) {
+        } else if (requestConfig.getMethod().equalsIgnoreCase("POST")) {
+
+            String requestBody =
+                    requestConfig.getBody() == null ? "" : requestConfig.getBody();
 
             request = builder
-                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .POST(
+                            HttpRequest.BodyPublishers.ofString(
+                                    requestBody
+                            )
+                    )
                     .build();
 
         } else {
 
             throw new IllegalArgumentException(
-                    "Unsupported HTTP method: " + method
+                    "Unsupported HTTP method: " + requestConfig.getMethod()
             );
         }
 
         long start = System.nanoTime();
-
         return client
                 .sendAsync(
                         request,
@@ -77,12 +95,19 @@ public class RequestExecutor {
                         FailureType failureType;
 
                         if (cause instanceof java.net.http.HttpTimeoutException) {
+
                             failureType = FailureType.TIMEOUT;
+
                         } else if (cause instanceof java.net.UnknownHostException) {
+
                             failureType = FailureType.DNS_ERROR;
+
                         } else if (cause instanceof java.net.ConnectException) {
+
                             failureType = FailureType.CONNECTION_ERROR;
+
                         } else {
+
                             failureType = FailureType.UNKNOWN;
                         }
 
@@ -93,7 +118,6 @@ public class RequestExecutor {
                                 failureType
                         );
                     }
-
                     int statusCode = response.statusCode();
 
                     if (statusCode >= 200 && statusCode < 400) {
@@ -109,7 +133,7 @@ public class RequestExecutor {
                     if (statusCode >= 400 && statusCode < 500) {
 
                         return new RequestResult(
-                                true,
+                                false,
                                 statusCode,
                                 latency,
                                 FailureType.CLIENT_ERROR
@@ -119,7 +143,7 @@ public class RequestExecutor {
                     if (statusCode >= 500) {
 
                         return new RequestResult(
-                                true,
+                                false,
                                 statusCode,
                                 latency,
                                 FailureType.SERVER_ERROR

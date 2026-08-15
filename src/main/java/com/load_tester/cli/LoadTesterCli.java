@@ -4,10 +4,11 @@ import com.load_tester.config.LoadTestConfig;
 import com.load_tester.config.LoadType;
 import com.load_tester.config.workload.FixedUsersConfig;
 import com.load_tester.engine.LoadEngine;
+import com.load_tester.http.HttpRequestConfig;
 
 public class LoadTesterCli {
 
-    private static final String VERSION = "1.0.0";
+    private static final String VERSION = "1.1.0";
 
     public static void main(String[] args) {
 
@@ -34,16 +35,19 @@ public class LoadTesterCli {
 
             LoadTestConfig config =
                     new LoadTestConfig(
-                            arguments.getUrl(),
-                            arguments.getMethod(),
+                            new HttpRequestConfig(
+                                    arguments.getUrl(),
+                                    arguments.getMethod(),
+                                    arguments.getBody(),
+                                    arguments.getHeaders(),
+                                    arguments.getTimeout()
+                                    ),
                             LoadType.FIXED_USERS,
-                            arguments.getBody(),
-                            arguments.getHeaders(),
                             new FixedUsersConfig(
                                     arguments.getUsers(),
                                     arguments.getDuration()
-                            )
-                    );
+                                    )
+                            );
 
             System.out.println();
             System.out.println("Load Tester");
@@ -59,6 +63,9 @@ public class LoadTesterCli {
             );
             System.out.println(
                     "Duration : " + arguments.getDuration() + "s"
+            );
+            System.out.println(
+                    "Timeout  : " + arguments.getTimeout() + "s"
             );
             System.out.println(
                     "Model    : FIXED_USERS"
@@ -124,9 +131,14 @@ public class LoadTesterCli {
                 "  --duration <seconds>    Test duration"
         );
         System.out.println(
+                "  --timeout <seconds>     Request timeout (default: 30)"
+        );
+        System.out.println(
                 "  --body <body>           Request body for POST"
         );
-
+        System.out.println(
+                "  --body-file <file>      Read POST body from file"
+        );
         System.out.println(
                 "  --header <name:value>   HTTP request header (repeatable)"
         );

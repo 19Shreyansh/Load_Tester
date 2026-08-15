@@ -45,19 +45,19 @@ public class MetricsPrinter {
         System.out.println("Latency");
         System.out.println("-------");
         System.out.printf(
-                "%-20s : %d ms%n",
+                "%-20s : %s%n",
                 "P50",
-                p50
+                formatPercentile(p50)
         );
         System.out.printf(
-                "%-20s : %d ms%n",
+                "%-20s : %s%n",
                 "P95",
-                p95
+                formatPercentile(p95)
         );
         System.out.printf(
-                "%-20s : %d ms%n",
+                "%-20s : %s%n",
                 "P99",
-                p99
+                formatPercentile(p99)
         );
         System.out.printf(
                 "%-20s : %d ms%n",
@@ -79,6 +79,11 @@ public class MetricsPrinter {
         printFailures(metrics);
         System.out.println("=================================");
     }
+    private String formatPercentile(long value){
+        if(value<0) return "N/A";
+        return value+"ms";
+    }
+
     private void printStatusCodes(MetricsCollector metrics) {
         System.out.println("Status Codes");
         System.out.println("------------");
