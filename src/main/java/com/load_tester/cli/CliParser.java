@@ -15,6 +15,7 @@ public class CliParser {
         }
 
         Map<String, String> values = new HashMap<>();
+        Map<String, String> headers = new HashMap<>();
 
         for (int i = 0; i < args.length; i++) {
 
@@ -32,16 +33,28 @@ public class CliParser {
                 );
             }
 
-            values.put(argument, args[++i]);
+            String value=args[++i];
+            if(argument.equals("--header"))
+                parseHeader(value,headers);
+            else
+                values.put(argument,value);
         }
 
         String url = values.get("--url");
+        String method = values.get("--method");
         String usersValue = values.get("--users");
         String durationValue = values.get("--duration");
+        String body=values.get("--body");
 
         if (url == null) {
             throw new IllegalArgumentException(
                     "Missing required argument: --url"
+            );
+        }
+
+        if (method == null) {
+            throw new IllegalArgumentException(
+                    "Missing required argument: --method"
             );
         }
 
@@ -59,6 +72,10 @@ public class CliParser {
 
         validateUrl(url);
 
+        method = validateMethod(method);
+
+        validateBody(method,body);
+
         int users = parsePositiveInteger(
                 usersValue,
                 "--users"
@@ -69,7 +86,32 @@ public class CliParser {
                 "--duration"
         );
 
-        return new CliArguments(url, users, duration);
+        return new CliArguments(
+                url,
+                users,
+                duration,
+                method,
+                body,
+                headers
+        );
+    }
+
+    private static void  parseHeader(String value, Map<String, String> headers){
+        int separator=value.indexOf(":");
+        if(separator<=0)
+            throw new IllegalArgumentException("Invalid header format. Use: --header \"Name: Value\"");
+        String name=value.substring(0,separator).trim();
+        String headerValue=value.substring(separator+1).trim();
+        if(name.isEmpty())
+            throw new IllegalArgumentException("Header name cannot  be empty");
+        if(headerValue.isEmpty())
+            throw  new IllegalArgumentException("Header value cannot be empty");
+        headers.put(name, headerValue);
+    }
+
+    public static void validateBody(String method, String body){
+        if(body!=null && !method.equalsIgnoreCase("POST"))
+            throw new IllegalArgumentException("--body can only be used with POST");
     }
 
     private static void validateUrl(String url) {
@@ -97,6 +139,19 @@ public class CliParser {
                     "Invalid URL: " + url
             );
         }
+    }
+
+    private static String validateMethod(String method) {
+
+        if (!method.equalsIgnoreCase("GET")
+                && !method.equalsIgnoreCase("POST")) {
+
+            throw new IllegalArgumentException(
+                    "--method must be GET or POST."
+            );
+        }
+
+        return method.toUpperCase();
     }
 
     private static int parsePositiveInteger(

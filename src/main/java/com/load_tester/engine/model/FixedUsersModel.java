@@ -38,7 +38,7 @@ public class FixedUsersModel implements LoadModel {
         ExecutorService executorService = Executors.newFixedThreadPool(users);
         List<Future<?>> futures = new ArrayList<>();
         for (int i = 0; i < users; i++) {
-            VirtualUser user = new VirtualUser(executor, metrics, config.getUrl(), endTime);
+            VirtualUser user = new VirtualUser(executor, metrics, config.getUrl(), config.getMethod(), endTime);
             Future<?> future = executorService.submit(user);
             futures.add(future);
         }

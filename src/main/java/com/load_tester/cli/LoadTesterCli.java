@@ -35,7 +35,10 @@ public class LoadTesterCli {
             LoadTestConfig config =
                     new LoadTestConfig(
                             arguments.getUrl(),
+                            arguments.getMethod(),
                             LoadType.FIXED_USERS,
+                            arguments.getBody(),
+                            arguments.getHeaders(),
                             new FixedUsersConfig(
                                     arguments.getUsers(),
                                     arguments.getDuration()
@@ -47,6 +50,9 @@ public class LoadTesterCli {
             System.out.println("-----------");
             System.out.println(
                     "Target   : " + arguments.getUrl()
+            );
+            System.out.println(
+                    "Method   : " + arguments.getMethod()
             );
             System.out.println(
                     "Users    : " + arguments.getUsers()
@@ -101,7 +107,7 @@ public class LoadTesterCli {
         System.out.println();
         System.out.println("Usage:");
         System.out.println(
-                "  loadtester --url <url> --users <users> --duration <seconds>"
+                "  loadtester --url <url> --method <GET|POST> --users <users> --duration <seconds>"
         );
         System.out.println();
         System.out.println("Options:");
@@ -109,10 +115,20 @@ public class LoadTesterCli {
                 "  --url <url>             Target URL"
         );
         System.out.println(
+                "  --method <GET|POST>     HTTP request method"
+        );
+        System.out.println(
                 "  --users <number>        Number of concurrent users"
         );
         System.out.println(
                 "  --duration <seconds>    Test duration"
+        );
+        System.out.println(
+                "  --body <body>           Request body for POST"
+        );
+
+        System.out.println(
+                "  --header <name:value>   HTTP request header (repeatable)"
         );
         System.out.println(
                 "  --version               Show version"

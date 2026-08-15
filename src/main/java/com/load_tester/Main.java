@@ -7,6 +7,8 @@ import com.load_tester.config.workload.FixedUsersConfig;
 import com.load_tester.config.workload.WorkloadConfig;
 import com.load_tester.engine.LoadEngine;
 
+import java.util.Map;
+
 public class Main
 {
     public static void main(String[] args)
@@ -23,8 +25,10 @@ public class Main
                 new LoadTestConfig(
 //                        "https://httpbin.org/get",
                         "https://jsonplaceholder.typicode.com/posts/1",
-//                        "GET",
+                        "GET",
                         LoadType.FIXED_USERS,
+                        null,
+                        Map.of(),
                         new FixedUsersConfig(30,10)
                 );
         new LoadEngine().run(config);

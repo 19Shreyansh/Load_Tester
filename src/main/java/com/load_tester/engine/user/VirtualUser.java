@@ -8,12 +8,14 @@ public class VirtualUser implements Runnable{
     private final MetricsCollector metrics;
     private final String url;
     private final long endTime;
+    private final String method;
 
-    public VirtualUser(RequestExecutor executor, MetricsCollector metrics, String url, long endTime){
+    public VirtualUser(RequestExecutor executor, MetricsCollector metrics, String url, String method, long endTime){
         this.executor=executor;
         this.metrics=metrics;
         this.url=url;
         this.endTime=endTime;
+        this.method=method;
     }
 
     @Override
@@ -23,7 +25,7 @@ public class VirtualUser implements Runnable{
             while(System.currentTimeMillis()<endTime) {
                 metrics.requestStarted();
                 try {
-                    executor.execute(url).thenAccept(result -> metrics.record(result)).join();
+                    executor.execute(url,method).thenAccept(result -> metrics.record(result)).join();
                 } finally {
                     metrics.requestFinished();
                 }
